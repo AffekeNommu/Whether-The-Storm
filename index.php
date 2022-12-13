@@ -1,5 +1,5 @@
 <html lang="en">
-    <head>
+   <head>
       <title>Whether</title>
       <!--Javascript libraries and corresponding styles-->
       <!-- jQuery -->
@@ -22,6 +22,7 @@
 var times=[];
 var temps=[];
 var hums=[];
+var days=1;
 
 //functions
 function loadData(){
@@ -29,16 +30,16 @@ function loadData(){
     url: './function.php',
     type: 'get',
     contentType: "application/json",
-	  dataType: 'json',
-    data: {Action:'get'},
+          dataType: 'json',
+    data: {Action:'get', Days:days},
     success: function(data) {
-  	//called when successful
+        //called when successful
     //console.log(temps.responseJSON); //good we have the data in JSON
     //make a nice set of 3 arrays for the chart to use - labels, temp and hum
     $.each(readings.responseJSON, function (idx, val) {
       temps.push(val['Temperature'])
       timetemp=moment(val['TimeStamp']+'Z')
-      times.push(timetemp.format('MM/DD HH:mm'))
+      times.push(timetemp.format('DD/MM HH:mm'))
       hums.push(val['Humidity'])
     });
     chartload();
@@ -64,7 +65,7 @@ function chartload(){
         yAxisID: 'percent'
       }]
     },
-    options:{
+            options:{
       scales:{
         yAxes:[
           {
@@ -96,6 +97,11 @@ function chartload(){
 
 $( document ).ready(function() {
 loadData();
+$('#days').change(function() {
+  days=document.getElementById('days').value
+  myChart.removeData();
+  loadData();
+});
 });
 //end of the page js
 </script>
