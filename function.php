@@ -2,13 +2,8 @@
 // globals for test use
 $GLOBALS['$servername'] = "127.0.0.1";
 $GLOBALS['$username'] = "listuser";
-$GLOBALS['$password'] = "listuser";
-$GLOBALS['$dbname'] = "test";
-//live server globals
-//$GLOBALS['$servername'] = "localhost";
-//$GLOBALS['$username'] = "root";
-//$GLOBALS['$password'] = "password";
-//$GLOBALS['$dbname'] = "Temperature";
+$GLOBALS['$password'] = "Listuser1";
+$GLOBALS['$dbname'] = "temperature";
 
 //test input to see which function gets used
     $action = $_GET['Action'];
@@ -23,7 +18,7 @@ function insert(){
   $password = $GLOBALS['$password'];
   $dbname = $GLOBALS['$dbname'];
   // Create connection
-  $conn = new mysqli($servername, $username, $password, $dbname, 0, '/path/to/mysql/socket');
+  $conn = new mysqli($servername, $username, $password, $dbname, 3306);
   // Check connection
   if ($conn->connect_error) {
       die("Connection failed: " . $conn->connect_error);
@@ -42,19 +37,20 @@ function insert(){
 }
 
 function get(){
+  //example https://<site>/function.php?Action=get&Days=1
   $servername = $GLOBALS['$servername'];
   $username = $GLOBALS['$username'];
   $password = $GLOBALS['$password'];
   $dbname = $GLOBALS['$dbname'];
   $output=array();
   // Create connection
-  $conn = new mysqli($servername, $username, $password, $dbname, 0,'/path/to/mysql/socket');
-  //$conn = new mysqli($servername, $username, $password, $dbname, 3306);
+  $conn = new mysqli($servername, $username, $password, $dbname, 3306);
   // Check connection
   if ($conn->connect_error) {
       die("Connection failed: " . $conn->connect_error);
   }
-  $sql = "SELECT Temperature, Humidity, TimeStamp FROM `Readings` WHERE TimeStamp > date_add(now(), INTERVAL -7 DAY) ORDER by TimeStamp ASC";
+  $Days=$_GET["Days"];
+  $sql = "SELECT Temperature, Humidity, TimeStamp FROM `Readings` WHERE TimeStamp > date_add(now(), INTERVAL -(cast('$Days' as UNSIGNED)) DAY) ORDER by TimeStamp ASC";
   $result = $conn->query($sql);
   if ($result->num_rows > 0) {
      //stuff into array
@@ -71,6 +67,7 @@ function get(){
   } else echo '';//need blank array for datatable if empty
   //return as json
   echo json_encode($output);
+  //echo $sql;
   $conn->close();
 }
 ?>
